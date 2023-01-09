@@ -1,0 +1,36 @@
+
+BIT - Exam
+
+1. For persistent cache Redis was installed and used on Docker Desktop
+       command for Redis start:   docker-compose up -d --build
+
+2. Two entry points were where created in Rest controller (LoadController class)
+   I used postman for testing APIs
+
+    POST localhost:8080/fraud/transaction/{fileName}
+        with attached transactions.csv in body
+
+    GET localhost:8080/fraud/transaction/transactions.csv
+
+3. Flow description:
+        1) LoadController get CSV file and forward it to TransactionEnrichmentService.
+        2) TransactionEnrichmentService save CSV file in 'savedfiled' directory and parse it.
+           Send extracted IPs for enrichment process as follows:
+                a) Check if IPs presented in Redis cache as (key, value) -> (ip, UserEvent.class)
+                   If yes, sand back JSON string from UserEvent.
+                   If no, send request to http://api.ipstack.com/... to acquire additional information
+                          for given IP. Then save received JSON string in Redis cache and sent it back.
+
+                b) Convert obtained additional data form JSON string to model objects and save in CSV file
+                   under 'enrichedfiles' directory.
+
+4. There is no assumptions and constraints for JSON scheme and CSV structure.
+   Two new fields were added to transactions.csv with basic toString method
+            - String type
+            - Array location
+
+   To improve readability toString could be override with any assumptions.
+
+
+
+
